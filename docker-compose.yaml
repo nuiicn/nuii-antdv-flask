@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  db:
+    platform: linux/x86_64
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 2024
+      MYSQL_DATABASE: nuii_antdv_flask
+    networks:
+      - network
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    environment:
+      PMA_ARBITRARY: 1
+    networks:
+      - network
+#  flask:
+#    build: ./flask
+#    ports:
+#      - "5000:5000"
+#    depends_on:
+#      - db
+#    volumes:
+#      - ./flask:/app
+#    environment:
+#      DATABASE_URL: mysql://root:123456@db/nuii_antdv_flask
+#    networks:
+#      - network
+#  antdv:
+#    build: ./antdv
+#    ports:
+#      - "8000:80"
+#    depends_on:
+#      - backend
+#      - db
+#    volumes:
+#      - ./flask:/app
+#    networks:
+#      - network
+
+networks:
+    network:
