@@ -1,36 +1,39 @@
-# nuii-antdv-flask
+<h1>Nuii Antdv Flask</h1>
 
-#### Description
-{**When you're done, you can delete the content in this README and update the file with details for others getting started with your repository**}
+## Introduction
 
-#### Software Architecture
-Software architecture description
+## Features
 
-#### Installation
+## Preview
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+## Community
 
-#### Instructions
+## Useage
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+```bash
+```
 
-#### Contribution
+## Contribute
 
-1.  Fork the repository
-2.  Create Feat_xxx branch
-3.  Commit your code
-4.  Create Pull Request
+We are very welcome to have you participate in our open source project.
 
 
-#### Gitee Feature
+**Pull Request:**
 
-1.  You can use Readme\_XXX.md to support different languages, such as Readme\_en.md, Readme\_zh.md
-2.  Gitee blog [blog.gitee.com](https://blog.gitee.com)
-3.  Explore open source project [https://gitee.com/explore](https://gitee.com/explore)
-4.  The most valuable open source project [GVP](https://gitee.com/gvp)
-5.  The manual of Gitee [https://gitee.com/help](https://gitee.com/help)
-6.  The most popular members  [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+1. Fork code!
+2. Create your own branch: `git checkout -b feat-xxxx`
+3. Submit your changes: `git commit -am 'feat(function): add xxxxx'`
+4. Push your branch: `git push origin feat-xxxx`
+5. submit`pull request`
+
+Thank you to all the people who already contributed to nuii-antdv-flask!
+
+## Support
+
+If you like our project, you can support us by clicking the "Star" button in the upper right corner. Your support is my motivation. Thank you ~
+
+
+## Sponsor
+
+If you like our project, you can sponsor us to help us maintain the project better.
+

@@ -1,10 +1,10 @@
 {
-  "name": "antdv-pro",
+  "name": "nuii-antdv-flask",
   "type": "module",
   "version": "1.2.0",
   "packageManager": "pnpm@9.1.1",
-  "author": "aibayanyu <aibayanyu@qq.com>",
-  "repository": "antdv-pro/antdv-pro",
+  "author": "nuii <nuii@gmail.com>",
+  "repository": "nuii-antdv-flask",
   "engines": {
     "node": ">=18.15.0"
   },

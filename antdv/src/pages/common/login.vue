@@ -3,7 +3,7 @@ import { AlipayCircleFilled, LockOutlined, MobileOutlined, TaobaoCircleFilled, U
 import { delayTimer } from '@v-c/utils'
 import { AxiosError } from 'axios'
 import GlobalLayoutFooter from '~/layouts/components/global-footer/index.vue'
-import { loginApi } from '~/api/common/login'
+import { loginApi } from '~/api/auth/login'
 import { getQueryParam } from '~/utils/tools'
 import type { LoginMobileParams, LoginParams } from '~@/api/common/login'
 import pageBubble from '@/utils/page-bubble'
@@ -239,7 +239,8 @@ onBeforeUnmount(() => {
                 <a-checkbox v-model:checked="loginModel.remember">
                   {{ t('pages.login.rememberMe') }}
                 </a-checkbox>
-                <a>{{ t('pages.login.forgotPassword') }}</a>
+                <!--<a>{{ t('pages.login.forgotPassword') }}</a>-->
+                <RouterLink to="/register">没有账号？去注册</RouterLink>
               </div>
               <a-button type="primary" block :loading="submitLoading" size="large" @click="submit">
                 {{ t('pages.login.submit') }}

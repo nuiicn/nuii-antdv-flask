@@ -231,7 +231,7 @@ onBeforeUnmount(() => {
                 </a-form-item>
               </template>
               <div class="mb-24px flex-between">
-                <a>已有账号</a>
+                <RouterLink to="/login">已有账号？去登录</RouterLink>
               </div>
               <a-button type="primary" block :loading="submitLoading" size="large" @click="submit">
                 {{ t('pages.register.submit') }}

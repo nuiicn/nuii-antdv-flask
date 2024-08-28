@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="contour_plot2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/antdv/node_modules/.pnpm/contour_plot@0.0.1/node_modules/contour_plot/build/contour_plot.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

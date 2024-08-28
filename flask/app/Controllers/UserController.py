@@ -36,6 +36,6 @@ def user_list():
 
 @user.route('/info')
 def info():
-    token = UserAuthJWT.decode_auth_token(request.headers.get('Access-Token'))
+    token = UserAuthJWT.decode_auth_token(request.headers.get('authorization'))
     userData = User.query.filter_by(id=token.get('data')['id']).first()
     return BaseController().success(data=userData.to_json(), msg='登录成功')

@@ -1,20 +1,8 @@
-<div align="center"> <a href="https://github.com/antdv-pro/antdv-pro"> <img alt="VbenAdmin Logo" width="200" height="200" src="./public/logo.svg"> </a> <br> <br>
-
-
-<h1>Nuii</h1>
-
-</div>
-
-![gitee](https://gitee.com/antdv-pro/antdv-pro/badge/star.svg)
-![github](https://img.shields.io/github/stars/antdv-pro/antdv-pro?style=social)
+<h1>Nuii Antdv Flask</h1>
 
 **English** | [简体中文](./README.zh-CN.md)
 
-
 ## Introduction
-
-AntdvPro is a complete set of enterprise-level mid-backend front-end/design solutions based on Vue3, Vite4, ant-design-vue4, Pinia, UnoCSS and Typescript. It refers to the design pattern of Ali react version antd-pro, using the latest and most popular The front-end technology stack has built-in dynamic routing, multi-theme, multi-layout and other functions, which can help you quickly build enterprise-level mid-background product prototypes.
-
 
 ## Features
 
@@ -30,40 +18,13 @@ AntdvPro is a complete set of enterprise-level mid-backend front-end/design solu
 * Request function: Based on axios, a set of request functions with complete types and some basic interceptor encapsulations are encapsulated. You only need to make corresponding implementation adjustments according to the requirements to meet the different needs of various projects.
 * Mobile compatibility: We have tried our best to make the basic framework compatible with the mobile terminal mode, but because our main goal is the enterprise-level mid-background product, we have not made too much adaptation to the mobile terminal. If your project needs to adapt to the mobile terminal, you can refer to our code for corresponding adjustments.
 
-
 ## Preview
 
-[antdv-pro](https://antdv-pro.com) -  Test Account: admin/admin
-
-[antdv-pro-js](https://github.com/antdv-pro/antdv-pro/tree/feat-js) - Javascript version
-
-[antdv-pro-js-gitee](https://gitee.com/antdv-pro/antdv-pro/tree/feat-js/) - Gitee Javascript version
-
-[antdv-pro-docs](https://docs.antdv-pro.com) - Documentation
-
 ## Community
-
-QQ Group: apply wechat group
-
-Wechat: aibayanyu2022
-
-Discord: [discord](https://discord.gg/tPb4G6gXmm)
-
-### WeChatGroup （二群扫码）
-
-<img src="https://git.lingyu.org.cn/yanyu/images/raw/branch/main/wx-group.jpg" width="300">
-
 
 ## Useage
 
 ```bash
-
-# Install degit
-npm  i -g degit
-
-# Pull the code
-degit antdv-pro/antdv-pro [your project name]
-
 #  Switch to the project directory
 cd [your project name]
 
@@ -87,20 +48,13 @@ We are very welcome to have you participate in our open source project.
 4. Push your branch: `git push origin feat-xxxx`
 5. submit`pull request`
 
-Thank you to all the people who already contributed to antdv-pro!
-
-<a href="https://github.com/antdv-pro/antdv-pro/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=antdv-pro/antdv-pro&max=100&columns=15" />
-</a>
+Thank you to all the people who already contributed to nuii-antdv-flask!
 
 ## Support
 
 If you like our project, you can support us by clicking the "Star" button in the upper right corner. Your support is my motivation. Thank you ~
 
-Thanks to the open source project license provided by [Jetbrains](https://www.jetbrains.com/?from=antdv-pro).
 
 ## Sponsor
 
 If you like our project, you can sponsor us to help us maintain the project better.
-
-[Alipay/Wechat](https://docs.antdv-pro.com/other/sponsor.html)

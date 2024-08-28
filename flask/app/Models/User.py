@@ -18,7 +18,7 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True)
     email = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(255))
-    last_login_time = db.Column(db.DateTime, default=datetime.now)
+    login_time = db.Column(db.DateTime, default=datetime.now)
     login_status = db.Column(db.Integer)
     avatar = db.Column(db.String(255))
     status = db.Column(db.Integer)
@@ -47,7 +47,7 @@ class User(db.Model):
             'username': self.username,
             'email': self.email,
             "password": self.password,
-            'last_login_time': self.last_login_time.strftime('%Y年%m月%d日') if self.login_time else '',
+            'login_time': self.login_time.strftime('%Y年%m月%d日') if self.login_time else '',
             'login_status': self.login_status,
             'avatar': self.avatar,
             'status': self.status,
