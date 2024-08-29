@@ -72,10 +72,7 @@ const showLogo = computed(() => {
     :style="siderStyle"
   >
     <div v-if="showLogo" class="ant-pro-sider-logo" :class="collapsed && !isMobile ? 'ant-pro-sider-collapsed' : ''">
-      <a>
-        <img :src="logo" alt="logo">
-        <h1 v-if="!collapsed || isMobile">{{ title }}</h1>
-      </a>
+      <h1 v-if="!collapsed || isMobile">{{ title }}</h1>
     </div>
     <div class="flex-1 of-x-hidden of-y-auto scrollbar">
       <Menu />

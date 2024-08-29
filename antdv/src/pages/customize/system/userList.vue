@@ -1,74 +1,96 @@
 <script setup lang="ts">
-import { Modal } from 'ant-design-vue'
-import { ColumnHeightOutlined, DownOutlined, PlusOutlined, ReloadOutlined, SettingOutlined, UpOutlined } from '@ant-design/icons-vue'
-import type { MenuProps, PaginationProps, TableProps } from 'ant-design-vue'
-import type { ConsultTableModel, ConsultTableParams } from '~@/api/list/table-list'
-import { deleteApi, getListApi } from '~@/api/list/table-list'
+import { h } from 'vue'
+import type {MenuProps, PaginationProps} from 'ant-design-vue'
+import {Modal} from 'ant-design-vue'
+import {ColumnHeightOutlined, PlusOutlined, ReloadOutlined, SettingOutlined, UserOutlined, SearchOutlined, EditOutlined, EllipsisOutlined} from '@ant-design/icons-vue'
+import type {UserTableParams, UserTableModel} from '~@/api/customize/system/user'
+import {getListApi} from '~@/api/customize/system/user'
+import UserFormModal from './userFormModal.vue'
 
-const statusMap = {
-  0: '关闭',
-  1: '运行中',
-  2: '上线',
-  3: '错误',
+const loginStatusMap = {
+  0: '未登录',
+  1: '已登录',
 }
+
+const switchStatusMap = reactive({
+  on: true,
+  off: false,
+})
+
 const message = useMessage()
+const loading = shallowRef(false)
 const columns = shallowRef([
   {
     title: '#',
     dataIndex: 'id',
   },
   {
-    title: '规则名称',
-    dataIndex: 'name',
+    title: '头像',
+    dataIndex: 'avatar',
   },
   {
-    title: '描述',
-    dataIndex: 'desc',
+    title: '所属部门',
+    dataIndex: 'department_id',
   },
   {
-    title: '服务调用次数',
-    dataIndex: 'callNo',
+    title: '直属领导',
+    dataIndex: 'parent_id',
   },
   {
-    title: '状态',
+    title: '昵称',
+    dataIndex: 'nickname',
+  },
+  {
+    title: '用户名',
+    dataIndex: 'username',
+  },
+  {
+    title: '电子邮箱',
+    dataIndex: 'email',
+  },
+  {
+    title: '最后登录时间',
+    dataIndex: 'login_time',
+  },
+  {
+    title: '当前登录状态',
+    dataIndex: 'login_status',
+  },
+  {
+    title: '用户状态',
     dataIndex: 'status',
     width: 100,
   },
   {
-    title: '上次调度时间',
-    dataIndex: 'updatedAt',
-    width: 200,
-  },
-  {
-    title: '操作',
+    title: '',
     dataIndex: 'action',
-    width: 200,
+    width: 100,
   },
 ])
-const loading = shallowRef(false)
+const formModel = reactive<UserTableParams>({
+  nickname: undefined,
+  username: undefined,
+  email: undefined,
+  login_time: undefined,
+  login_status: undefined,
+  status: undefined,
+})
+const userFormModal = ref<InstanceType<typeof UserFormModal>>()
+const dataSource = shallowRef<UserTableModel[]>([])
 const pagination = reactive<PaginationProps>({
-  pageSize: 10,
-  pageSizeOptions: ['10', '20', '30', '40'],
+  pageSize: 2,
+  pageSizeOptions: ['10', '20', '30', '40', '50'],
   current: 1,
-  total: 100,
+  total: 10,
   showSizeChanger: true,
   showQuickJumper: true,
-  showTotal: total => `总数据位：${total}`,
+  showTotal: total => `用户总数：${total} 人`,
   onChange(current, pageSize) {
     pagination.pageSize = pageSize
     pagination.current = current
     init()
   },
 })
-const dataSource = shallowRef<ConsultTableModel[]>([])
-const formModel = reactive<ConsultTableParams>({
-  name: undefined,
-  callNo: undefined,
-  desc: undefined,
-  status: undefined,
-  updatedAt: undefined,
-})
-
 const tableSize = ref<string[]>(['large'])
 const sizeItems = ref<MenuProps['items']>([
   {
@@ -87,7 +109,6 @@ const sizeItems = ref<MenuProps['items']>([
     title: '紧凑',
   },
 ])
-const open = ref(false)
 const options = computed(() => {
   return columns.value.map((item) => {
     if (item.dataIndex === 'action') {
@@ -112,16 +133,17 @@ const state = reactive({
 })
 
 async function init() {
-  if (loading.value)
-    return
+  if (loading.value) return
   loading.value = true
   try {
-    const { data } = await getListApi({
+    const { result } = await getListApi({
       ...formModel,
       current: pagination.current,
       pageSize: pagination.pageSize,
     })
-    dataSource.value = data ?? []
+    dataSource.value = result.data
+    pagination.current = result.current
+    pagination.total = result.totalPage
   }
   catch (e) {
     console.log(e)
@@ -137,9 +159,8 @@ async function onSearch() {
 }
 
 async function onReset() {
-  // 清空所有参数重新请求
-  formModel.name = undefined
-  formModel.desc = undefined
+  formModel.nickname = undefined
+  formModel.username = undefined
   await init()
 }
 
@@ -148,7 +169,7 @@ async function onReset() {
  *  @param record
  *
  */
-async function handleDelete(record: ConsultTableModel) {
+async function handleDelete(record: UserTableModel) {
   const close = message.loading('删除中......')
   try {
     const res = await deleteApi(record!.id)
@@ -169,9 +190,17 @@ async function handleDelete(record: ConsultTableModel) {
  *
  */
 function handleOk() {
-  open.value = false
+  message.success('操作成功')
   Modal.destroyAll()
   onSearch()
+}
+
+function handleAdd() {
+  userFormModal.value?.open()
+}
+
+function handleEdit(record: UserTableModel) {
+  userFormModal.value?.open(record)
 }
 
 /**
@@ -203,7 +232,6 @@ const filterColumns = ref(filterAction(getCheckList.value))
  * 全选/反选事件
  *
  */
-
 function handleCheckAllChange(e: any) {
   Object.assign(state, {
     checkList: e.target.checked ? getCheckList.value : [],
@@ -213,11 +241,11 @@ function handleCheckAllChange(e: any) {
 }
 
 watch(
-  () => state.checkList,
-  (val) => {
-    state.indeterminate = !!val.length && val.length < getCheckList.value.length
-    state.checkAll = val.length === getCheckList.value.length
-  },
+    () => state.checkList,
+    (val) => {
+      state.indeterminate = !!val.length && val.length < getCheckList.value.length
+      state.checkAll = val.length === getCheckList.value.length
+    },
 )
 
 /**
@@ -234,67 +262,28 @@ function handleResetChange() {
  *
  */
 function handleCheckChange(value: any) {
-  const filterValue = filterAction(value)
-  filterColumns.value = filterValue
+  filterColumns.value = filterAction(value)
 }
 
 onMounted(() => {
   init()
 })
-
-const expand = ref(false)
 </script>
-
 <template>
-  <page-container>
+  <div>
     <a-card mb-4>
-      <a-form :label-col="{ span: 7 }" :model="formModel">
-        <a-row :gutter="[15, 0]">
+      <a-form :label-col="{ span: 2 }" :model="formModel">
+        <a-row :gutter="[0, 0]">
           <a-col :span="8">
-            <a-form-item name="name" label="规则名称">
-              <a-input v-model:value="formModel.name" />
+            <a-form-item name="username" label="" class="form-item">
+              <a-input v-model:value="formModel.username" placeholder="请输入搜索内容">
+                <template #prefix>
+                  <search-outlined style="color: rgba(255, 255, 255, 0.45)" />
+                </template>
+              </a-input>
             </a-form-item>
           </a-col>
-          <a-col :span="8">
-            <a-form-item name="desc" label="描述">
-              <a-input v-model:value="formModel.desc" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="8">
-            <a-form-item name="updatedAt" label="上次调用时间">
-              <a-date-picker v-model:value="formModel.updatedAt" style="width: 100%" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row v-if="expand" :gutter="[15, 0]">
-          <a-col :span="8">
-            <a-form-item name="status" label="状态">
-              <a-select
-                v-model:value="formModel.status"
-              >
-                <a-select-option value="0">
-                  关闭
-                </a-select-option>
-                <a-select-option value="1">
-                  运行中
-                </a-select-option>
-                <a-select-option value="2">
-                  上线
-                </a-select-option>
-                <a-select-option value="3">
-                  错误
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :span="8">
-            <a-form-item name="callNo" label="服务调用次数">
-              <a-input-number v-model:value="formModel.callNo" style="width: 100%" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :span="24" style="text-align: right">
-          <a-col :span="24">
+          <a-col :span="16">
             <a-space flex justify-end w-full>
               <a-button :loading="loading" type="primary" @click="onSearch">
                 查询
@@ -302,26 +291,24 @@ const expand = ref(false)
               <a-button :loading="loading" @click="onReset">
                 重置
               </a-button>
-              <a-button type="link" @click="expand = !expand">
-                {{ expand ? '收起' : '展开' }}
-                <UpOutlined v-if="expand" />
-                <DownOutlined v-else />
-              </a-button>
             </a-space>
           </a-col>
         </a-row>
       </a-form>
     </a-card>
-
-    <a-card title="查询表格">
-      <template #extra>
+    <a-card>
+      <template #title>
         <a-space size="middle">
-          <a-button type="primary" @click="() => open = true">
+          <a-button type="primary" @click="handleAdd">
             <template #icon>
               <PlusOutlined />
             </template>
             新增
           </a-button>
+        </a-space>
+      </template>
+      <template #extra>
+        <a-space size="middle">
           <a-tooltip title="刷新">
             <ReloadOutlined @click="onSearch" />
           </a-tooltip>
@@ -358,26 +345,62 @@ const expand = ref(false)
       <a-table :loading="loading" :columns="filterColumns" :data-source="dataSource" :pagination="pagination" :size="tableSize[0] as TableProps['size']">
         <template #bodyCell="scope">
           <template v-if="scope?.column?.dataIndex === 'action'">
-            <div flex gap-2>
-              <a c-error @click="handleDelete(scope?.record as ConsultTableModel)">
-                删除
-              </a>
+            <div flex>
+              <a-button type="text" :icon="h(EditOutlined)" @click="handleEdit(scope?.record as UserTableModel)" />
+              <a-dropdown>
+                <a-button type="text" :icon="h(EllipsisOutlined)" />
+                <template #overlay>
+                  <a-menu>
+                    <a-menu-item>
+                      <a @click="handleEdit(scope?.record as UserTableModel)">
+                        修改密码
+                      </a>
+                    </a-menu-item>
+                    <a-menu-item>
+                      <a @click="handleEdit(scope?.record as UserTableModel)">
+                        编辑用户
+                      </a>
+                    </a-menu-item>
+                    <a-menu-item>
+                      <a-popconfirm
+                        title="确定删除该条数据？" ok-text="确定" cancel-text="取消"
+                        @confirm="handleDelete(scope?.record as UserTableModel)"
+                      >
+                        <a>
+                          删除用户
+                        </a>
+                      </a-popconfirm>
+                    </a-menu-item>
+                  </a-menu>
+                </template>
+              </a-dropdown>
             </div>
           </template>
+          <template v-if="scope?.column?.dataIndex === 'avatar'">
+            <a-avatar>
+              <template #icon><UserOutlined /></template>
+            </a-avatar>
+          </template>
+          <template v-if="scope?.column?.dataIndex === 'login_status'">
+            <a-tag v-if="scope?.record?.login_status === 1" color="green">
+              {{ loginStatusMap[scope?.record?.login_status as keyof typeof loginStatusMap] as string }}
+            </a-tag>
+            <a-tag v-else color="orange">
+              {{ loginStatusMap[scope?.record?.login_status as keyof typeof loginStatusMap] as string }}
+            </a-tag>
+          </template>
           <template v-if="scope?.column?.dataIndex === 'status'">
-            <div gap-2>
-              {{ statusMap[scope?.record?.status as keyof typeof statusMap] as string }}
-            </div>
+            <a-switch v-if="scope?.record?.status" v-model:checked="switchStatusMap['on']" disabled />
+            <a-switch v-else v-model:checked="switchStatusMap['off']" size="small" disabled />
           </template>
         </template>
       </a-table>
     </a-card>
-
-    <a-modal v-model:open="open" title="新建规则" width="400px" @ok="">
-      <a-space direction="vertical" size="large" class="w-full">
-        <a-input placeholder="请输入" />
-        <a-textarea placeholder="请输入" />
-      </a-space>
-    </a-modal>
-  </page-container>
+    <user-form-modal ref="userFormModal" @ok="handleOk" />
+  </div>
 </template>
+<style lang="less" scoped>
+.form-item {
+  margin-bottom: 0;
+}
+</style>

@@ -1,8 +1,9 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { basicRouteMap } from './router-modules'
 import { AccessEnum } from '~@/utils/constant'
+import customizeRoutes from './customize-routes'
 
-export default [
+const routes = [
   {
     path: '/dashboard',
     redirect: '/dashboard/analysis',
@@ -456,4 +457,6 @@ export default [
       },
     ],
   },
-] as RouteRecordRaw[]
+]
+
+export default [...customizeRoutes, ...routes] as RouteRecordRaw[]

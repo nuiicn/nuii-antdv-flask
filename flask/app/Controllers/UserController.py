@@ -1,9 +1,21 @@
+from app import db
 from app.Controllers.BaseController import BaseController
 from app.Models.User import User
 from app.Vendor.UserAuthJWT import UserAuthJWT
 from flask import Blueprint, request, jsonify
 
 user = Blueprint('user', __name__)
+
+
+@user.route('/upsert', methods=['POST'])
+def upsert():
+    data = request.get_json()
+    userById = User.query.get(data['id'])
+    userById.nickname = data['nickname']
+    userById.username = data['username']
+    userById.email = data['email']
+    db.session.add(userById)
+    return jsonify({'message': '操作成功', 'status': 200, 'timestamp': ''})
 
 
 @user.route('/list')
@@ -21,17 +33,18 @@ def user_list():
     else:
         sort_by = User.created_time.desc()
 
-    pageNo = request.args.get('pageNo', 1, type=int)
+    current = request.args.get('current', 1, type=int)
     pageSize = request.args.get('pageSize', 10, type=int)
-    pagination = User.query.filter(*filters).order_by(sort_by).paginate(page=pageNo, per_page=pageSize, error_out=False)
+    pagination = User.query.filter(*filters).order_by(sort_by).paginate(page=current, per_page=pageSize,
+                                                                        error_out=False)
     result = {
         'data': [item.to_json() for item in pagination.items],
         "pageSize": pageSize,
-        "pageNo": pageNo,
+        "current": current,
         "totalPage": pagination.total,
         "totalCount": User.query.filter(*filters).count()
     }
-    return jsonify({'message': '操作成功', 'status': 200, 'timestamp': '', 'result': result})
+    return jsonify({'msg': '操作成功', 'status': 200, 'timestamp': '', 'result': result})
 
 
 @user.route('/info')

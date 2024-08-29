@@ -1,7 +1,7 @@
 import type { LayoutSetting } from '~@/stores/app'
 
 export default {
-  title: 'Nuii',
+  title: 'nuii-antdv-flask',
   theme: 'light',
   logo: '/logo.svg',
   collapsed: false,
@@ -14,7 +14,7 @@ export default {
   splitMenus: false,
   header: true,
   menu: true,
-  watermark: true,
+  watermark: false,
   menuHeader: true,
   footer: false,
   colorWeak: false,

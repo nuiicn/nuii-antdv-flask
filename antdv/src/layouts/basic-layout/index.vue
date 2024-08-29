@@ -80,4 +80,5 @@ const contentCls = computed(() => {
 
 <style lang="less">
 @import './index.less';
+@import '../../pages/customize/customize.less';
 </style>
