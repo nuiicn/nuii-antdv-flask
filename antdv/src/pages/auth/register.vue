@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AlipayCircleFilled, LockOutlined, MobileOutlined, TaobaoCircleFilled, UserOutlined, WeiboCircleFilled } from '@ant-design/icons-vue'
+import { LockOutlined, MobileOutlined, UserOutlined } from '@ant-design/icons-vue'
 import { delayTimer } from '@v-c/utils'
 import { AxiosError } from 'axios'
 import GlobalLayoutFooter from '~/layouts/components/global-footer/index.vue'
@@ -89,7 +89,6 @@ async function submit() {
   }
   catch (e) {
     if (e instanceof AxiosError) {
-      console.log('e', e)
       errorAlert.value = true
     }
     submitLoading.value = false
@@ -231,7 +230,7 @@ onBeforeUnmount(() => {
                 </a-form-item>
               </template>
               <div class="mb-24px flex-between">
-                <RouterLink to="/login">已有账号？去登录</RouterLink>
+                <RouterLink to="/login">已经有账号？点击这里登录</RouterLink>
               </div>
               <a-button type="primary" block :loading="submitLoading" size="large" @click="submit">
                 {{ t('pages.register.submit') }}
@@ -320,7 +319,7 @@ onBeforeUnmount(() => {
 
 }
 
-.nuii-form-register-main{
+.nuii-form-register-main {
   box-shadow: var(--c-shadow);
 }
 
@@ -336,35 +335,39 @@ onBeforeUnmount(() => {
     color: var(--pro-ant-color-primary);
   }
 }
+
 .register-media(@width:100%) {
-  .nuii-form-register-main{
+  .nuii-form-register-main {
     width: @width;
   }
-  .nuii-form-register-main-left{
+  .nuii-form-register-main-left {
     display: none;
   }
-  .nuii-form-register-main-right{
+  .nuii-form-register-main-right {
     width: 100%;
   }
-  .nuii-form-register-desc{
+  .nuii-form-register-desc {
     display: none;
   }
 }
+
 @media (min-width : 992px) {
   .nuii-form-register-main-left{
     width: 700px;
   }
 }
-@media(min-width:768px) and (max-width:991px){
-  .nuii-register-divider{
+
+@media(min-width:768px) and (max-width:991px) {
+  .nuii-register-divider {
     display: none;
   }
   .register-media(400px)
 }
+
 @media screen and (max-width:767px) {
   .register-media(350px);
 
-  .nuii-register-divider{
+  .nuii-register-divider {
     display: none;
   }
 }

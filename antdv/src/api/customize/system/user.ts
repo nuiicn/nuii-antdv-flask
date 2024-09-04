@@ -1,7 +1,5 @@
-import type { STATUS } from '~@/utils/constant'
-
 interface UserTableModel {
-  id: number
+  id: string
   parent_id: number
   department_id: number
   nickname: string
@@ -16,21 +14,45 @@ interface UserTableModel {
   updated_time: string
   created_by: number
   created_time: string
-  roles?: (string | number)[]
-  pageSize?: number
+  roles: (string | number)[]
+  current: number
+  pageSize: number
+  column?: string
+  value?: string
+}
+
+interface UserTableColumn {
+  dataIndex: keyof UserTableModel
+}
+
+interface UpdateTableColumn {
+  id: string
+  column: string
+  value: string
 }
 
 type UserTableParams = Partial<Omit<UserTableModel, 'id'>>
 
 export async function getListApi(params?: UserTableParams) {
-  return useGet<UserTableModel[]>('/user/list', params)
+  return useGet('/user/list', params)
 }
 
-export async function upsertApi(params: UserTableParams) {
+export async function upsertApi(params: UserTableModel) {
   return usePost('/user/upsert', params)
 }
 
+export async function updateTableColumnApi(params: UpdateTableColumn) {
+  return useGet('/user/update-table-column', params)
+}
+
+export async function getUsersExcludingCurrentApi(id: string) {
+  return useGet('/user/excluding-current', {'id': id})
+}
+
+
 export type {
-  UserTableParams,
   UserTableModel,
+  UserTableColumn,
+  UserTableParams,
+  UpdateTableColumn,
 }

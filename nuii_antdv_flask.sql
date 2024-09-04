@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.1
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: db
--- Generation Time: Jul 29, 2024 at 06:28 AM
--- Server version: 5.7.36
--- PHP Version: 7.4.20
+-- Generation Time: Sep 03, 2024 at 01:07 AM
+-- Server version: 5.7.44
+-- PHP Version: 8.2.8
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -86,6 +86,34 @@ CREATE TABLE `chat_messages` (
   `created_by` int(11) DEFAULT NULL,
   `created_time` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `departments`
+--
+
+CREATE TABLE `departments` (
+  `id` int(11) NOT NULL,
+  `parent_id` int(11) DEFAULT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  `description` text,
+  `status` int(11) DEFAULT NULL,
+  `updated_by` int(11) NOT NULL,
+  `updated_time` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_time` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `departments`
+--
+
+INSERT INTO `departments` (`id`, `parent_id`, `name`, `description`, `status`, `updated_by`, `updated_time`, `created_by`, `created_time`) VALUES
+(1, 0, '全球总部', 'Global Headquarters', 1, 1, '2024-09-03 06:34:31', 1, '2024-09-03 06:34:31'),
+(2, 1, '亚太区', 'Asia-Pacific Region, APAC', 1, 1, '2024-09-02 22:12:37', 1, '2024-09-02 22:12:37'),
+(3, 2, '中国区', 'China Region', 1, 1, '2024-09-03 07:15:13', 1, '2024-09-03 07:15:13'),
+(4, 3, '华北区', 'North China Region', 1, 1, '2024-09-03 07:15:13', 1, '2024-09-03 07:15:13');
 
 -- --------------------------------------------------------
 
@@ -263,6 +291,7 @@ INSERT INTO `permission_actions` (`id`, `permission_id`, `action_id`) VALUES
 CREATE TABLE `roles` (
   `id` int(11) NOT NULL,
   `name` varchar(50) DEFAULT NULL,
+  `description` text,
   `code` varchar(50) DEFAULT NULL,
   `describe` varchar(255) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
@@ -276,9 +305,9 @@ CREATE TABLE `roles` (
 -- Dumping data for table `roles`
 --
 
-INSERT INTO `roles` (`id`, `name`, `code`, `describe`, `status`, `updated_by`, `updated_time`, `created_by`, `created_time`) VALUES
-(1, '管理员', 'admin', '拥有所有权限', 1, 1, '2024-07-16 16:19:16', 1, '2024-07-16 16:19:16'),
-(2, '会员', 'member', '普通会员', 1, 1, '2024-07-16 23:57:36', 1, '2024-07-16 23:57:36');
+INSERT INTO `roles` (`id`, `name`, `description`, `code`, `describe`, `status`, `updated_by`, `updated_time`, `created_by`, `created_time`) VALUES
+(1, '管理员', NULL, 'admin', '拥有所有权限', 1, 1, '2024-07-16 16:19:16', 1, '2024-07-16 16:19:16'),
+(2, '会员', NULL, 'member', '普通会员', 1, 1, '2024-07-16 23:57:36', 1, '2024-07-16 23:57:36');
 
 -- --------------------------------------------------------
 
@@ -331,11 +360,13 @@ CREATE TABLE `sys_logs` (
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `parent_id` int(11) DEFAULT NULL,
+  `department_id` int(11) DEFAULT NULL,
   `nickname` varchar(50) DEFAULT NULL,
-  `login_name` varchar(50) DEFAULT NULL,
-  `login_email` varchar(50) DEFAULT NULL,
-  `login_pwd` varchar(255) DEFAULT NULL,
+  `username` varchar(50) DEFAULT NULL,
+  `email` varchar(50) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
   `login_time` datetime DEFAULT NULL,
+  `login_status` int(11) DEFAULT NULL,
   `avatar` varchar(255) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   `updated_by` int(11) DEFAULT NULL,
@@ -348,9 +379,11 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `parent_id`, `nickname`, `login_name`, `login_email`, `login_pwd`, `login_time`, `avatar`, `status`, `updated_by`, `updated_time`, `created_by`, `created_time`) VALUES
-(1, 0, 'nuii', 'nuii', 'nuii@gmail.com', 'scrypt:32768:8:1$pwxyEFYp8ZjTyGfD$65b731398611cbb8ef6e83d4499f6b499aeed88a9ff7bafd3dbac9f89e15f1c6a38d8f435de102e2179fe8d8b79056595889d78f00ac1fc2f982443592722275', NULL, NULL, 1, 1, '2024-07-24 23:52:41', 1, '2024-07-14 13:23:27'),
-(2, 0, 'nuii2', 'nuii2', 'nuii2@gmail.com', 'scrypt:32768:8:1$pwxyEFYp8ZjTyGfD$65b731398611cbb8ef6e83d4499f6b499aeed88a9ff7bafd3dbac9f89e15f1c6a38d8f435de102e2179fe8d8b79056595889d78f00ac1fc2f982443592722275', NULL, NULL, 1, 1, '2024-07-17 09:39:03', 1, '2024-07-16 19:29:25');
+INSERT INTO `users` (`id`, `parent_id`, `department_id`, `nickname`, `username`, `email`, `password`, `login_time`, `login_status`, `avatar`, `status`, `updated_by`, `updated_time`, `created_by`, `created_time`) VALUES
+(1, 0, 0, 'nuii', 'nuii', 'nuii-@gmail.com', 'scrypt:32768:8:1$pwxyEFYp8ZjTyGfD$65b731398611cbb8ef6e83d4499f6b499aeed88a9ff7bafd3dbac9f89e15f1c6a38d8f435de102e2179fe8d8b79056595889d78f00ac1fc2f982443592722275', '2024-08-25 19:12:36', 0, NULL, 0, 1, '2024-07-24 23:52:41', 1, '2024-07-14 13:23:27'),
+(2, 0, 0, 'nuii2', 'nuii2', 'nuii2@gmail.com', 'scrypt:32768:8:1$pwxyEFYp8ZjTyGfD$65b731398611cbb8ef6e83d4499f6b499aeed88a9ff7bafd3dbac9f89e15f1c6a38d8f435de102e2179fe8d8b79056595889d78f00ac1fc2f982443592722275', '2024-08-25 19:12:36', 0, NULL, 1, 1, '2024-07-17 09:39:03', 1, '2024-07-16 19:29:25'),
+(5, 0, 0, 'siping 6', 'siping 6', 'sipings06@gmail.com', 'pbkdf2:sha256:600000$mjq5XHYH9D9bCAJZ$0f1ca6b4a346a5854d7868e6b94e728e2fa63bc5271b130b02bd95c59e648b55', '2024-08-25 19:12:36', 0, NULL, 1, 0, '2024-08-28 23:25:02', 0, '2024-08-25 19:12:36'),
+(6, 1, 0, 'siping', 'siping', 'siping', 'pbkdf2:sha256:600000$pGhlUix3lB6gamJI$9d6ff70d90a65a0a8d0289622ad206382067821528c24632f6e0e9df161b4604', '2024-09-02 16:39:51', 0, NULL, 1, 0, '2024-09-02 16:40:40', 0, '2024-09-02 16:39:51');
 
 -- --------------------------------------------------------
 
@@ -392,6 +425,12 @@ ALTER TABLE `chats`
 -- Indexes for table `chat_messages`
 --
 ALTER TABLE `chat_messages`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `departments`
+--
+ALTER TABLE `departments`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -443,8 +482,8 @@ ALTER TABLE `role_permissions`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `login_name` (`login_name`),
-  ADD UNIQUE KEY `login_email` (`login_email`);
+  ADD UNIQUE KEY `login_name` (`username`),
+  ADD UNIQUE KEY `login_email` (`email`);
 
 --
 -- Indexes for table `user_roles`
@@ -475,6 +514,12 @@ ALTER TABLE `chats`
 --
 ALTER TABLE `chat_messages`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `departments`
+--
+ALTER TABLE `departments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `llms`
@@ -522,7 +567,7 @@ ALTER TABLE `role_permissions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `user_roles`

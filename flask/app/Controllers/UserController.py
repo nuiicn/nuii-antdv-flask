@@ -35,16 +35,31 @@ def user_list():
 
     current = request.args.get('current', 1, type=int)
     pageSize = request.args.get('pageSize', 10, type=int)
-    pagination = User.query.filter(*filters).order_by(sort_by).paginate(page=current, per_page=pageSize,
-                                                                        error_out=False)
-    result = {
-        'data': [item.to_json() for item in pagination.items],
+    pagination = User.query.filter(*filters).order_by(sort_by).paginate(page=current, per_page=pageSize, error_out=False)
+    data = {
+        'list': [item.to_json() for item in pagination.items],
         "pageSize": pageSize,
         "current": current,
         "totalPage": pagination.total,
         "totalCount": User.query.filter(*filters).count()
     }
-    return jsonify({'msg': '操作成功', 'status': 200, 'timestamp': '', 'result': result})
+    return jsonify({'msg': '操作成功', 'status': 200, 'timestamp': '', 'data': data})
+
+
+@user.route('/update-table-column')
+def updateTableColumn():
+    userById = User.query.get(request.args['id'])
+    setattr(userById, request.args['column'], request.args['value'])
+    db.session.commit()
+
+    return jsonify({'msg': '操作成功', 'status': 200, 'timestamp': ''})
+
+
+@user.route('/excluding-current')
+def excludingCurrent():
+    users = User.query.with_entities(User.id, User.username).filter(User.id != request.args['id']).all()
+    data = [{'id': item[0], 'username': item[1]} for item in users]
+    return jsonify({'msg': '操作成功', 'status': 200, 'timestamp': '', 'data': data})
 
 
 @user.route('/info')

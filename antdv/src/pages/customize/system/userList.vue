@@ -1,21 +1,22 @@
 <script setup lang="ts">
 import { h } from 'vue'
-import type {MenuProps, PaginationProps} from 'ant-design-vue'
+import type {MenuProps, PaginationProps, TableProps} from 'ant-design-vue'
 import {Modal} from 'ant-design-vue'
 import {ColumnHeightOutlined, PlusOutlined, ReloadOutlined, SettingOutlined, UserOutlined, SearchOutlined, EditOutlined, EllipsisOutlined} from '@ant-design/icons-vue'
-import type {UserTableParams, UserTableModel} from '~@/api/customize/system/user'
-import {getListApi} from '~@/api/customize/system/user'
+import type {UserTableModel, UserTableParams} from '~@/api/customize/system/user'
+import {getListApi, getUsersExcludingCurrentApi} from '~@/api/customize/system/user'
 import UserFormModal from './userFormModal.vue'
+import UserEditableColumn from '../component/userEditableColumn.vue'
 
 const loginStatusMap = {
-  0: '未登录',
-  1: '已登录',
+  0: '离线',
+  1: '在线',
 }
 
-const switchStatusMap = reactive({
-  on: true,
-  off: false,
-})
+const statusMap = {
+  0: '异常',
+  1: '正常',
+}
 
 const message = useMessage()
 const loading = shallowRef(false)
@@ -53,7 +54,7 @@ const columns = shallowRef([
     dataIndex: 'login_time',
   },
   {
-    title: '当前登录状态',
+    title: '登录状态',
     dataIndex: 'login_status',
   },
   {
@@ -62,23 +63,18 @@ const columns = shallowRef([
     width: 100,
   },
   {
-    title: '',
+    title: '操作',
     dataIndex: 'action',
     width: 100,
   },
 ])
 const formModel = reactive<UserTableParams>({
-  nickname: undefined,
-  username: undefined,
-  email: undefined,
-  login_time: undefined,
-  login_status: undefined,
-  status: undefined,
+  nickname: '',
 })
 const userFormModal = ref<InstanceType<typeof UserFormModal>>()
 const dataSource = shallowRef<UserTableModel[]>([])
 const pagination = reactive<PaginationProps>({
-  pageSize: 2,
+  pageSize: 10,
   pageSizeOptions: ['10', '20', '30', '40', '50'],
   current: 1,
   total: 10,
@@ -136,14 +132,14 @@ async function init() {
   if (loading.value) return
   loading.value = true
   try {
-    const { result } = await getListApi({
+    const { data } = await getListApi({
       ...formModel,
       current: pagination.current,
       pageSize: pagination.pageSize,
     })
-    dataSource.value = result.data
-    pagination.current = result.current
-    pagination.total = result.totalPage
+    dataSource.value = data.list
+    pagination.current = data.current
+    pagination.total = data.totalPage
   }
   catch (e) {
     console.log(e)
@@ -159,9 +155,19 @@ async function onSearch() {
 }
 
 async function onReset() {
-  formModel.nickname = undefined
-  formModel.username = undefined
+  formModel.nickname = ''
   await init()
+}
+
+const usersExcludingCurrent = ref()
+const getUsersExcludingCurrent = async (id: string) => {
+  try {
+    const { data } = await getUsersExcludingCurrentApi(id)
+    usersExcludingCurrent.value = data
+  }
+  catch (e) {
+    console.log(e)
+  }
 }
 
 /**
@@ -343,28 +349,28 @@ onMounted(() => {
         </a-space>
       </template>
       <a-table :loading="loading" :columns="filterColumns" :data-source="dataSource" :pagination="pagination" :size="tableSize[0] as TableProps['size']">
-        <template #bodyCell="scope">
-          <template v-if="scope?.column?.dataIndex === 'action'">
+        <template #bodyCell="{ column, record }">
+          <template v-if="column.dataIndex === 'action'">
             <div flex>
-              <a-button type="text" :icon="h(EditOutlined)" @click="handleEdit(scope?.record as UserTableModel)" />
+              <a-button type="text" :icon="h(EditOutlined)" @click="handleEdit(record as UserTableModel)" />
               <a-dropdown>
                 <a-button type="text" :icon="h(EllipsisOutlined)" />
                 <template #overlay>
                   <a-menu>
                     <a-menu-item>
-                      <a @click="handleEdit(scope?.record as UserTableModel)">
+                      <a @click="handleEdit(record as UserTableModel)">
                         修改密码
                       </a>
                     </a-menu-item>
                     <a-menu-item>
-                      <a @click="handleEdit(scope?.record as UserTableModel)">
+                      <a @click="handleEdit(record as UserTableModel)">
                         编辑用户
                       </a>
                     </a-menu-item>
                     <a-menu-item>
                       <a-popconfirm
                         title="确定删除该条数据？" ok-text="确定" cancel-text="取消"
-                        @confirm="handleDelete(scope?.record as UserTableModel)"
+                        @confirm="handleDelete(record as UserTableModel)"
                       >
                         <a>
                           删除用户
@@ -376,22 +382,46 @@ onMounted(() => {
               </a-dropdown>
             </div>
           </template>
-          <template v-if="scope?.column?.dataIndex === 'avatar'">
+          <template v-if="column.dataIndex === 'avatar'">
             <a-avatar>
               <template #icon><UserOutlined /></template>
             </a-avatar>
           </template>
-          <template v-if="scope?.column?.dataIndex === 'login_status'">
-            <a-tag v-if="scope?.record?.login_status === 1" color="green">
-              {{ loginStatusMap[scope?.record?.login_status as keyof typeof loginStatusMap] as string }}
-            </a-tag>
-            <a-tag v-else color="orange">
-              {{ loginStatusMap[scope?.record?.login_status as keyof typeof loginStatusMap] as string }}
+          <template v-if="column.dataIndex === 'department_id'">
+            <a-tag color="green">
+              <span v-for="(item, index) in record.department_id" :key="index">
+                <span>{{ item.name }}</span>
+                <span v-if="index < record.department_id.length - 1"> - </span>
+              </span>
             </a-tag>
           </template>
-          <template v-if="scope?.column?.dataIndex === 'status'">
-            <a-switch v-if="scope?.record?.status" v-model:checked="switchStatusMap['on']" disabled />
-            <a-switch v-else v-model:checked="switchStatusMap['off']" size="small" disabled />
+          <template v-if="
+            column.dataIndex === 'nickname' ||
+            column.dataIndex === 'username' ||
+            column.dataIndex === 'email' ||
+            column.dataIndex === 'parent_id'"
+          >
+            <UserEditableColumn
+              :dataSource="dataSource"
+              :column="column"
+              :record="record"
+            />
+          </template>
+          <template v-if="column.dataIndex === 'login_status'">
+            <a-tag v-if="record.login_status === 1" color="green">
+              {{ loginStatusMap[record.login_status as keyof typeof loginStatusMap] as string }}
+            </a-tag>
+            <a-tag v-else color="orange">
+              {{ loginStatusMap[record.login_status as keyof typeof loginStatusMap] as string }}
+            </a-tag>
+          </template>
+          <template v-if="column.dataIndex === 'status'">
+            <a-tag v-if="record.status === 1" color="green">
+              {{ statusMap[record.status as keyof typeof statusMap] as string }}
+            </a-tag>
+            <a-tag v-else color="orange">
+              {{ statusMap[record.status as keyof typeof statusMap] as string }}
+            </a-tag>
           </template>
         </template>
       </a-table>
@@ -399,8 +429,4 @@ onMounted(() => {
     <user-form-modal ref="userFormModal" @ok="handleOk" />
   </div>
 </template>
-<style lang="less" scoped>
-.form-item {
-  margin-bottom: 0;
-}
-</style>
+<style lang="less" scoped></style>

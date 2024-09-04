@@ -42,7 +42,7 @@ class User(db.Model):
         json = {
             'id': self.id,
             'parent_id': self.get_parent_by_id(),
-            'departments': Department.get_all_parents(self.department_id),
+            'department_id': Department.get_all_parents(self.department_id),
             'nickname': self.nickname,
             'username': self.username,
             'email': self.email,
@@ -63,7 +63,7 @@ class User(db.Model):
 
     def get_parent_by_id(self):
         parent = User.query.filter_by(id=self.parent_id).first()
-        return parent.nickname if parent else 'System'
+        return parent.nickname if parent else '首席执行官'
 
     # 设置密码
     @staticmethod

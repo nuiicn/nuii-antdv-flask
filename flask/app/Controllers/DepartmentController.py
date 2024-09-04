@@ -4,10 +4,9 @@ from flask import Blueprint, request, jsonify
 
 department = Blueprint('department', __name__)
 
-
 @department.route('/list')
 def department_list():
-    filters = []
+    filters = [Department.id != 1]
     if 'name' in request.args:
         filters.append(Department.name.like('%' + request.args['name'] + '%'))
     if 'status' in request.args and request.args['status'] != '2':
@@ -20,17 +19,37 @@ def department_list():
     else:
         sort_by = Department.created_time.desc()
 
-    pageNo = request.args.get('pageNo', 1, type=int)
+    current = request.args.get('current', 1, type=int)
     pageSize = request.args.get('pageSize', 10, type=int)
-    pagination = Department.query.filter(*filters).order_by(sort_by).paginate(page=pageNo, per_page=pageSize, error_out=False)
-    result = {
-        'data': [item.to_json() for item in pagination.items],
+    pagination = Department.query.filter(*filters).order_by(sort_by).paginate(page=current, per_page=pageSize, error_out=False)
+    data = {
+        'list': [item.to_json() for item in pagination.items],
         "pageSize": pageSize,
-        "pageNo": pageNo,
+        "current": current,
         "totalPage": pagination.total,
         "totalCount": Department.query.filter(*filters).count()
     }
-    return jsonify({'message': '操作成功', 'status': 200, 'timestamp': '', 'result': result})
+    return jsonify({'message': '操作成功', 'status': 200, 'timestamp': '', 'data': data})
+
+
+@department.route('/tree')
+def department_tree():
+    from collections import defaultdict
+    departments = Department.query.filter(Department.status == 1).all()
+
+    tree = defaultdict(list)
+    for row in departments:
+        tree[row.parent_id].append({'id': row.id, 'name': row.name})
+
+    def build_tree(parent_id):
+        branch = tree[parent_id]
+        for node in branch:
+            children = build_tree(node['id'])
+            if children:
+                node['children'] = children
+        return branch
+
+    return jsonify({'message': '操作成功', 'status': 200, 'timestamp': '', 'data': build_tree(0)})
 
 #
 # @role.route('/changeStatus', methods=['POST'])

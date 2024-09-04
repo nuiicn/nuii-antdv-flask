@@ -37,3 +37,38 @@
 .ant-table-wrapper .ant-table-container table>thead>tr:first-child >*:last-child {
   border-start-end-radius: 3px;
 }
+
+.form-item {
+  margin-bottom: 0;
+}
+
+.editable-cell {
+  position: relative;
+  .editable-cell-icon,
+  .editable-cell-icon-check {
+    position: absolute;
+    right: 0;
+    width: 20px;
+    cursor: pointer;
+  }
+  .editable-cell-icon {
+    margin-top: 4px;
+    display: none;
+  }
+  .editable-cell-icon-check {
+    margin-top: 8px;
+  }
+  .editable-cell-icon:hover,
+  .editable-cell-icon-check:hover {
+    color: var(--pro-ant-color-primary);
+  }
+  .editable-cell-input {
+    width: 85%;
+  }
+  .editable-cell-select {
+    width: 75%;
+  }
+}
+.editable-cell:hover .editable-cell-icon {
+  display: inline-block;
+}

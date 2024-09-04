@@ -23,9 +23,9 @@ class Department(db.Model):
             'name': self.name,
             'description': self.description,
             'status': self.status,
-            'updated_by': self.updated_by,
+            'updated_by': self.get_username_by_id(self.updated_by),
             'updated_time': self.updated_time.strftime('%Y年%m月%d日 %H:%M:%S'),
-            'created_by': self.created_by,
+            'created_by': self.get_username_by_id(self.created_by),
             'created_time': self.created_time.strftime('%Y年%m月%d日 %H:%M:%S')
         }
 
@@ -36,8 +36,18 @@ class Department(db.Model):
         parents = []
         current_department = Department.query.get(department_id)
         while current_department and current_department.parent_id is not None:
-            parents.append(current_department)
+            parents.append({
+                'id': current_department.id,
+                'parent_id': current_department.parent_id,
+                'name': current_department.name
+            })
             current_department = Department.query.get(current_department.parent_id)
         # parents.reverse()
-        result = [parent.to_json() for parent in parents]
-        return result
+        data = [parent for parent in parents]
+        return data
+
+    @staticmethod
+    def get_username_by_id(user_id):
+        from app.Models.User import User
+        user = User.query.get(user_id)
+        return user.username if user else None
