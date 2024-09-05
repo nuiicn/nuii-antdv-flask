@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { FormInstance } from 'ant-design-vue'
 import { cloneDeep } from 'lodash'
-import type {UserTableModel} from '~@/api/customize/system/user'
-import {upsertApi} from '~@/api/customize/system/user'
+import {
+  UserTableParams,
+  upsertApi
+} from '@/api/customize/system/user'
 
-const emit = defineEmits(['cancel', 'ok'])
+const emit = defineEmits(['cancel', 'submit'])
 const isUpdate = ref(false)
 const visible = ref(false)
 
@@ -15,23 +17,23 @@ const title = computed(() => {
 })
 
 const formRef = ref<FormInstance>()
-const formData = ref<UserTableModel>({
+const formData = ref<UserTableParams>({
   id: '',
-  parent_id: '',
-  department_id: '',
+  parent_id: 0,
+  department_id: [],
   nickname: '',
   username: '',
   email: '',
   avatar: '',
 })
 
-function open(record?: UserTableModel) {
+function open(record?: UserTableParams) {
   visible.value = true
   isUpdate.value = !!record?.id
   formData.value = cloneDeep(record) ?? {
     id: '',
-    parent_id: '',
-    department_id: '',
+    parent_id: 0,
+    department_id: [],
     nickname: '',
     username: '',
     email: '',
@@ -39,14 +41,13 @@ function open(record?: UserTableModel) {
   }
 }
 
-async function handleOk() {
+async function handleSubmit() {
   try {
     await formRef.value?.validate()
-    const { status } = await upsertApi({
+    const { code } = await upsertApi({
       ...formData.value,
     })
-    console.log(status)
-    if (status === 200) {
+    if (code === 200) {
       emit('ok')
       visible.value = false
     }
@@ -66,16 +67,16 @@ defineExpose({
 })
 </script>
 <template>
-  <a-modal v-model:open="visible" :title="title" @ok="handleOk" @cancel="handleCancel">
+  <a-modal v-model:open="visible" :title="title" @ok="handleSubmit" @cancel="handleCancel">
     <a-form ref="formRef" :model="formData" class="w-full" :label-col="labelCol" :wrapper-col="wrapperCol" style="margin-top: 20px">
       <a-form-item name="avatar" label="头像">
         <a-input v-model:value="formData.avatar" :maxlength="50" placeholder="" />
       </a-form-item>
-      <a-form-item name="parent_id" label="直属领导">
-        <a-input v-model:value="formData.parent_id" :maxlength="50" placeholder="" />
-      </a-form-item>
       <a-form-item name="department_id" label="所属部门">
         <a-input v-model:value="formData.department_id" :maxlength="50" placeholder="" />
+      </a-form-item>
+      <a-form-item name="parent_id" label="直属领导">
+        <a-input v-model:value="formData.parent_id" :maxlength="50" placeholder="" />
       </a-form-item>
       <a-form-item name="nickname" label="昵称" :rules="[{ required: true, message: '请输入昵称' }]">
         <a-input v-model:value="formData.nickname" :maxlength="50" placeholder="请输入昵称" />
@@ -85,9 +86,6 @@ defineExpose({
       </a-form-item>
       <a-form-item name="email" label="电子邮箱" :rules="[{ required: true, message: '请输入电子邮箱' }]">
         <a-input v-model:value="formData.email" :maxlength="50" placeholder="请输入电子邮箱" />
-      </a-form-item>
-      <a-form-item name="remark" label="备注">
-        <a-textarea v-model:value="formData.remark" show-count :maxlength="200" placeholder="请输入备注" />
       </a-form-item>
     </a-form>
   </a-modal>

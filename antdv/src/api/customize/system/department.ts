@@ -23,6 +23,10 @@ export async function upsertApi(params: DepartmentTableModel) {
   return usePost('/department/upsert', params)
 }
 
+export async function getDepartmentTreeApi(params?: DepartmentTableParams) {
+  return useGet('/department/tree', params)
+}
+
 export type {
   DepartmentTableParams,
   DepartmentTableModel,

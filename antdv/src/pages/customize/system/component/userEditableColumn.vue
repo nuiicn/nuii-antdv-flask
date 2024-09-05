@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type {UnwrapRef} from 'vue'
-import {CheckOutlined, EditOutlined} from "@ant-design/icons-vue"
-import {cloneDeep} from "lodash-es"
-import type {UserTableModel, UserTableColumn, UpdateTableColumn} from '~@/api/customize/system/user'
-import {getUsersExcludingCurrentApi, updateTableColumnApi} from '~@/api/customize/system/user'
+import type { UnwrapRef } from 'vue'
+import { CheckOutlined, EditOutlined } from "@ant-design/icons-vue"
+import { cloneDeep } from "lodash-es"
+import type { UserTableModel, UserTableColumn, UpdateTableColumn } from '@/api/customize/system/user.ts'
+import { getUsersExcludingCurrentApi, updateUserTableColumnApi } from '@/api/customize/system/user.ts'
 
 const props = defineProps<{
   dataSource: UserTableModel[]
@@ -25,14 +25,15 @@ const getUsersExcludingCurrent = async (id: string) => {
   }
 }
 
-const updateTableColumn = async (id: string, column: string, value: string) => {
+const updateTableColumn = async (id: string, column: string, value: string, type: string) => {
   try {
     const params: UpdateTableColumn = {
       'id': id,
       'column': column,
       'value': value,
+      'type': type,
     }
-    const { code } = await updateTableColumnApi(params)
+    const { code } = await updateUserTableColumnApi(params)
     if (code === 200) {
       console.log('success')
     }
@@ -42,14 +43,16 @@ const updateTableColumn = async (id: string, column: string, value: string) => {
   }
 }
 
-const editableColumnEdit = (id: string, column: string) => {
-  if (column === 'parent_id') getUsersExcludingCurrent(id)
+const editableColumnEdit = async (id: string, column: string) => {
+  if (column === 'parent_id') {
+    await getUsersExcludingCurrent(id)
+  }
   editableColumn[id] = cloneDeep(props.dataSource.filter(item => id === item.id)[0])
   selectedColumn.value = column
 }
 
-const editableColumnSave = async (id: string, column: string) => {
-  await updateTableColumn(id, column, editableColumn[id][column])
+const editableColumnSave = async (id: string, column: string, type: string) => {
+  await updateTableColumn(id, column, editableColumn[id][column], type)
   Object.assign(props.dataSource.filter(item => id === item.id)[0], editableColumn[id])
   selectedColumn.value = ''
   delete editableColumn[id]
@@ -62,7 +65,7 @@ const editableColumnSave = async (id: string, column: string) => {
         v-if="selectedColumn === 'parent_id'"
         v-model:value="editableColumn[record.id][column.dataIndex]"
         class="editable-cell-select"
-        @pressEnter="editableColumnSave(record.id, column.dataIndex)"
+        @change="editableColumnSave(record.id, column.dataIndex, 'select')"
       >
         <a-select-option
           v-for="item in usersExcludingCurrent"
@@ -77,11 +80,11 @@ const editableColumnSave = async (id: string, column: string) => {
         v-model:value="editableColumn[record.id][selectedColumn]"
         class="editable-cell-input"
         :placeholder="record[column.dataIndex]"
-        @pressEnter="editableColumnSave(record.id, selectedColumn)"
+        @pressEnter="editableColumnSave(record.id, selectedColumn, 'input')"
       />
       <check-outlined
         class="editable-cell-icon-check"
-        @click="editableColumnSave(record.id, selectedColumn)"
+        @click="editableColumnSave(record.id, selectedColumn, selectedColumn === 'parent_id' ? 'select' : 'input')"
       />
     </div>
     <div v-else>

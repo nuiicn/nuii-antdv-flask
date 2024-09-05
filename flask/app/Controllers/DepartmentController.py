@@ -29,7 +29,7 @@ def department_list():
         "totalPage": pagination.total,
         "totalCount": Department.query.filter(*filters).count()
     }
-    return jsonify({'message': '操作成功', 'status': 200, 'timestamp': '', 'data': data})
+    return jsonify({'message': '操作成功', 'code': 200, 'timestamp': '', 'data': data})
 
 
 @department.route('/tree')
@@ -39,17 +39,17 @@ def department_tree():
 
     tree = defaultdict(list)
     for row in departments:
-        tree[row.parent_id].append({'id': row.id, 'name': row.name})
+        tree[row.parent_id].append({'value': row.id, 'title': row.name})
 
     def build_tree(parent_id):
         branch = tree[parent_id]
         for node in branch:
-            children = build_tree(node['id'])
+            children = build_tree(node['value'])
             if children:
                 node['children'] = children
         return branch
 
-    return jsonify({'message': '操作成功', 'status': 200, 'timestamp': '', 'data': build_tree(0)})
+    return jsonify({'message': '操作成功', 'code': 200, 'timestamp': '', 'data': build_tree(0)})
 
 #
 # @role.route('/changeStatus', methods=['POST'])

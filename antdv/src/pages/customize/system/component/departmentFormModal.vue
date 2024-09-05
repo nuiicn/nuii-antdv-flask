@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { FormInstance } from 'ant-design-vue'
 import { cloneDeep } from 'lodash'
-import type {UserTableModel} from '~@/api/customize/system/user'
-import {upsertApi} from '~@/api/customize/system/user'
+import type { UserTableModel } from '@/api/customize/system/user.ts'
+import { upsertApi } from '@/api/customize/system/user.ts'
 
-const emit = defineEmits(['cancel', 'ok'])
+const emit = defineEmits(['cancel', 'submit'])
 const isUpdate = ref(false)
 const visible = ref(false)
 
@@ -39,15 +39,14 @@ function open(record?: UserTableModel) {
   }
 }
 
-async function handleOk() {
+async function handleSubmit() {
   try {
     await formRef.value?.validate()
-    const { status } = await upsertApi({
+    const { code } = await upsertApi({
       ...formData.value,
     })
-    console.log(status)
-    if (status === 200) {
-      emit('ok')
+    if (code === 200) {
+      emit('submit')
       visible.value = false
     }
   }
@@ -66,7 +65,7 @@ defineExpose({
 })
 </script>
 <template>
-  <a-modal v-model:open="visible" :title="title" @ok="handleOk" @cancel="handleCancel">
+  <a-modal v-model:open="visible" :title="title" @ok="handleSubmit" @cancel="handleCancel">
     <a-form ref="formRef" :model="formData" class="w-full" :label-col="labelCol" :wrapper-col="wrapperCol" style="margin-top: 20px">
       <a-form-item name="avatar" label="头像">
         <a-input v-model:value="formData.avatar" :maxlength="50" placeholder="" />

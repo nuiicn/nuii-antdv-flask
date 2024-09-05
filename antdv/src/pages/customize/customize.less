@@ -13,6 +13,7 @@
 .ant-btn,
 .ant-card,
 .ant-input,
+.ant-select-dropdown,
 .ant-select-single .ant-select-selector,
 .ant-menu .ant-menu-item,
 .ant-menu .ant-menu-submenu,
@@ -36,6 +37,16 @@
 
 .ant-table-wrapper .ant-table-container table>thead>tr:first-child >*:last-child {
   border-start-end-radius: 3px;
+}
+
+.ant-tree-select-dropdown .ant-select-tree .ant-select-tree-node-content-wrapper,
+.ant-tree-select-dropdown .ant-select-tree .ant-select-tree-checkbox+span {
+  border-radius: 3px
+}
+
+.ant-tree-select-dropdown .ant-select-tree .ant-select-tree-node-content-wrapper.ant-select-tree-node-selected,
+.ant-tree-select-dropdown .ant-select-tree .ant-select-tree-checkbox+span.ant-select-tree-node-selected {
+  background-color: var(--pro-ant-color-primary);
 }
 
 .form-item {

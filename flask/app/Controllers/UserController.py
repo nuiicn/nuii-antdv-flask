@@ -15,7 +15,8 @@ def upsert():
     userById.username = data['username']
     userById.email = data['email']
     db.session.add(userById)
-    return jsonify({'message': '操作成功', 'status': 200, 'timestamp': ''})
+
+    return jsonify({'message': '操作成功', 'code': 200, 'timestamp': ''})
 
 
 @user.route('/list')
@@ -43,23 +44,30 @@ def user_list():
         "totalPage": pagination.total,
         "totalCount": User.query.filter(*filters).count()
     }
-    return jsonify({'msg': '操作成功', 'status': 200, 'timestamp': '', 'data': data})
+    return jsonify({'msg': '操作成功', 'code': 200, 'timestamp': '', 'data': data})
 
 
 @user.route('/update-table-column')
 def updateTableColumn():
+    value = request.args['value']
+    if request.args['type'] == 'select':
+        print(request.args['value'])
+        userData = User.query.filter(User.username == request.args['value']).first()
+        value = userData.id if userData else None
     userById = User.query.get(request.args['id'])
-    setattr(userById, request.args['column'], request.args['value'])
+    setattr(userById, request.args['column'], value)
     db.session.commit()
 
-    return jsonify({'msg': '操作成功', 'status': 200, 'timestamp': ''})
+    print(User.query.get(request.args['id']).to_json())
+
+    return jsonify({'msg': '操作成功', 'code': 200, 'timestamp': '', 'data': User.query.get(request.args['id']).to_json()})
 
 
 @user.route('/excluding-current')
 def excludingCurrent():
     users = User.query.with_entities(User.id, User.username).filter(User.id != request.args['id']).all()
     data = [{'id': item[0], 'username': item[1]} for item in users]
-    return jsonify({'msg': '操作成功', 'status': 200, 'timestamp': '', 'data': data})
+    return jsonify({'msg': '操作成功', 'code': 200, 'timestamp': '', 'data': data})
 
 
 @user.route('/info')

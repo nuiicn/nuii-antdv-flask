@@ -1,12 +1,25 @@
 <script setup lang="ts">
 import { h } from 'vue'
-import type {MenuProps, PaginationProps, TableProps} from 'ant-design-vue'
-import {Modal} from 'ant-design-vue'
-import {ColumnHeightOutlined, PlusOutlined, ReloadOutlined, SettingOutlined, UserOutlined, SearchOutlined, EditOutlined, EllipsisOutlined} from '@ant-design/icons-vue'
-import type {UserTableModel, UserTableParams} from '~@/api/customize/system/user'
-import {getListApi, getUsersExcludingCurrentApi} from '~@/api/customize/system/user'
-import UserFormModal from './userFormModal.vue'
-import UserEditableColumn from '../component/userEditableColumn.vue'
+import type { MenuProps, PaginationProps, TableProps } from 'ant-design-vue'
+import { Modal } from 'ant-design-vue'
+import {
+  ColumnHeightOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  SettingOutlined,
+  UserOutlined,
+  SearchOutlined,
+  EditOutlined,
+  EllipsisOutlined
+} from '@ant-design/icons-vue'
+import {
+  UserTableModel,
+  UserTableParams,
+  getListApi
+} from '@/api/customize/system/user'
+import UserFormModal from './component/userFormModal.vue'
+import UserEditableColumn from './component/userEditableColumn.vue'
+import UserEditableColumnTree from './component/userEditableColumnTree.vue'
 
 const loginStatusMap = {
   0: '离线',
@@ -14,7 +27,7 @@ const loginStatusMap = {
 }
 
 const statusMap = {
-  0: '异常',
+  0: '关闭',
   1: '正常',
 }
 
@@ -87,7 +100,7 @@ const pagination = reactive<PaginationProps>({
     init()
   },
 })
-const tableSize = ref<string[]>(['large'])
+const tableSize = ref<string[]>(['small'])
 const sizeItems = ref<MenuProps['items']>([
   {
     key: 'large',
@@ -128,6 +141,10 @@ const state = reactive({
   checkList: getCheckList.value,
 })
 
+/**
+ * 初始化
+ *
+ */
 async function init() {
   if (loading.value) return
   loading.value = true
@@ -149,25 +166,22 @@ async function init() {
   }
 }
 
+/**
+ * 搜索
+ *
+ */
 async function onSearch() {
   pagination.current = 1
   await init()
 }
 
+/**
+ * 重置
+ *
+ */
 async function onReset() {
   formModel.nickname = ''
   await init()
-}
-
-const usersExcludingCurrent = ref()
-const getUsersExcludingCurrent = async (id: string) => {
-  try {
-    const { data } = await getUsersExcludingCurrentApi(id)
-    usersExcludingCurrent.value = data
-  }
-  catch (e) {
-    console.log(e)
-  }
 }
 
 /**
@@ -175,7 +189,7 @@ const getUsersExcludingCurrent = async (id: string) => {
  *  @param record
  *
  */
-async function handleDelete(record: UserTableModel) {
+async function handleDelete(record: UserTableParams) {
   const close = message.loading('删除中......')
   try {
     const res = await deleteApi(record!.id)
@@ -192,10 +206,10 @@ async function handleDelete(record: UserTableModel) {
 }
 
 /**
- * 新增事件
+ * 事件处理
  *
  */
-function handleOk() {
+function handleSubmit() {
   message.success('操作成功')
   Modal.destroyAll()
   onSearch()
@@ -205,7 +219,7 @@ function handleAdd() {
   userFormModal.value?.open()
 }
 
-function handleEdit(record: UserTableModel) {
+function handleEdit(record: UserTableParams) {
   userFormModal.value?.open(record)
 }
 
@@ -352,25 +366,25 @@ onMounted(() => {
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'action'">
             <div flex>
-              <a-button type="text" :icon="h(EditOutlined)" @click="handleEdit(record as UserTableModel)" />
+              <a-button type="text" :icon="h(EditOutlined)" @click="handleEdit(record)" />
               <a-dropdown>
                 <a-button type="text" :icon="h(EllipsisOutlined)" />
                 <template #overlay>
                   <a-menu>
                     <a-menu-item>
-                      <a @click="handleEdit(record as UserTableModel)">
+                      <a @click="handleEdit(record)">
                         修改密码
                       </a>
                     </a-menu-item>
                     <a-menu-item>
-                      <a @click="handleEdit(record as UserTableModel)">
+                      <a @click="handleEdit(record)">
                         编辑用户
                       </a>
                     </a-menu-item>
                     <a-menu-item>
                       <a-popconfirm
                         title="确定删除该条数据？" ok-text="确定" cancel-text="取消"
-                        @confirm="handleDelete(record as UserTableModel)"
+                        @confirm="handleDelete(record)"
                       >
                         <a>
                           删除用户
@@ -388,12 +402,11 @@ onMounted(() => {
             </a-avatar>
           </template>
           <template v-if="column.dataIndex === 'department_id'">
-            <a-tag color="green">
-              <span v-for="(item, index) in record.department_id" :key="index">
-                <span>{{ item.name }}</span>
-                <span v-if="index < record.department_id.length - 1"> - </span>
-              </span>
-            </a-tag>
+            <user-editable-column-tree
+              :dataSource="dataSource"
+              :column="column"
+              :record="record"
+            />
           </template>
           <template v-if="
             column.dataIndex === 'nickname' ||
@@ -401,7 +414,7 @@ onMounted(() => {
             column.dataIndex === 'email' ||
             column.dataIndex === 'parent_id'"
           >
-            <UserEditableColumn
+            <user-editable-column
               :dataSource="dataSource"
               :column="column"
               :record="record"
@@ -426,7 +439,6 @@ onMounted(() => {
         </template>
       </a-table>
     </a-card>
-    <user-form-modal ref="userFormModal" @ok="handleOk" />
+    <user-form-modal ref="userFormModal" @submit="handleSubmit" />
   </div>
 </template>
-<style lang="less" scoped></style>

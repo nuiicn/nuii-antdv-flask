@@ -1,13 +1,25 @@
 <script setup lang="ts">
-import {h} from 'vue'
-import type {UnwrapRef} from 'vue'
-import type {MenuProps, PaginationProps, TableProps} from 'ant-design-vue'
-import {Modal} from 'ant-design-vue'
-import {ColumnHeightOutlined, PlusOutlined, ReloadOutlined, SettingOutlined, SearchOutlined, CheckOutlined, EditOutlined, EllipsisOutlined} from '@ant-design/icons-vue'
-import {cloneDeep} from 'lodash-es'
-import type {DepartmentTableParams, DepartmentTableModel} from '~@/api/customize/system/department'
-import {getListApi} from '~@/api/customize/system/department'
-import UserFormModal from './userFormModal.vue'
+import { h } from 'vue'
+import type { UnwrapRef } from 'vue'
+import { cloneDeep } from 'lodash-es'
+import type { MenuProps, PaginationProps, TableProps } from 'ant-design-vue'
+import { Modal } from 'ant-design-vue'
+import {
+  ColumnHeightOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  SettingOutlined,
+  SearchOutlined,
+  CheckOutlined,
+  EditOutlined,
+  EllipsisOutlined
+} from '@ant-design/icons-vue'
+import {
+  DepartmentTableParams,
+  DepartmentTableModel,
+  getListApi
+} from '@/api/customize/system/department'
+import UserFormModal from './component/userFormModal.vue'
 
 const statusMap = {
   0: '异常',
@@ -148,31 +160,10 @@ async function onReset() {
 }
 
 /**
- * 删除功能
- *  @param record
- *
- */
-async function handleDelete(record: DepartmentTableModel) {
-  const close = message.loading('删除中......')
-  try {
-    const res = await deleteApi(record!.id)
-    if (res.code === 200)
-      await init()
-    message.success('删除成功')
-  }
-  catch (e) {
-    console.log(e)
-  }
-  finally {
-    close()
-  }
-}
-
-/**
  * 新增事件
  *
  */
-function handleOk() {
+function handleSubmit() {
   message.success('操作成功')
   Modal.destroyAll()
   onSearch()
@@ -398,7 +389,7 @@ onMounted(() => {
         </template>
       </a-table>
     </a-card>
-    <user-form-modal ref="userFormModal" @ok="handleOk" />
+    <user-form-modal ref="userFormModal" @submit="handleSubmit" />
   </div>
 </template>
 <style lang="less" scoped></style>

@@ -63,6 +63,7 @@ declare module 'vue' {
     ATag: typeof import('ant-design-vue/es')['Tag']
     ATextarea: typeof import('ant-design-vue/es')['Textarea']
     ATooltip: typeof import('ant-design-vue/es')['Tooltip']
+    ATreeSelect: typeof import('ant-design-vue/es')['TreeSelect']
     ATypographyText: typeof import('ant-design-vue/es')['TypographyText']
     AWatermark: typeof import('ant-design-vue/es')['Watermark']
     BaseLoading: typeof import('./../src/components/base-loading/index.vue')['default']

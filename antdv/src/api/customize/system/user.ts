@@ -1,7 +1,7 @@
 interface UserTableModel {
   id: string
   parent_id: number
-  department_id: number
+  department_id: Department[]
   nickname: string
   username: string
   email: string
@@ -21,6 +21,8 @@ interface UserTableModel {
   value?: string
 }
 
+type UserTableParams = Partial<UserTableModel>
+
 interface UserTableColumn {
   dataIndex: keyof UserTableModel
 }
@@ -29,19 +31,24 @@ interface UpdateTableColumn {
   id: string
   column: string
   value: string
+  type: string
 }
 
-type UserTableParams = Partial<Omit<UserTableModel, 'id'>>
+interface Department {
+  id: number
+  name: string
+  parent_id: number
+}
 
 export async function getListApi(params?: UserTableParams) {
   return useGet('/user/list', params)
 }
 
-export async function upsertApi(params: UserTableModel) {
+export async function upsertApi(params: UserTableParams) {
   return usePost('/user/upsert', params)
 }
 
-export async function updateTableColumnApi(params: UpdateTableColumn) {
+export async function updateUserTableColumnApi(params: UpdateTableColumn) {
   return useGet('/user/update-table-column', params)
 }
 
@@ -52,7 +59,7 @@ export async function getUsersExcludingCurrentApi(id: string) {
 
 export type {
   UserTableModel,
-  UserTableColumn,
   UserTableParams,
+  UserTableColumn,
   UpdateTableColumn,
 }
